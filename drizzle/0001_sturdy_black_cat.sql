@@ -1,0 +1,1 @@
+ALTER TABLE `securities` ADD `asset_type` text DEFAULT 'stock' NOT NULL;
