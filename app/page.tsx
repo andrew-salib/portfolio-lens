@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { SectorExposure } from "@/components/sector-exposure";
+import { apiFetch } from "@/lib/api";
 import snapshots from "@/lib/snapshots.json";
 import {
   Layers3,
@@ -10,7 +11,6 @@ import {
   Trash2,
   RefreshCw,
   Search,
-  ChartPie,
   Info,
   ArrowRight,
   Upload,
@@ -131,6 +131,15 @@ function formatPercentage(value: number) {
 export default function Home() {
   const [assets, setAssets] = useState<Asset[]>(INITIAL_ASSETS);
   const [busy, setBusy] = useState(false);
+  const [backendOffline, setBackendOffline] = useState(false);
+
+  useEffect(() => {
+    const update = (event: Event) => {
+      setBackendOffline((event as CustomEvent<boolean>).detail);
+    };
+    window.addEventListener("portfolio-backend", update);
+    return () => window.removeEventListener("portfolio-backend", update);
+  }, []);
   const [error, setError] = useState("");
   const [modal, setModal] = useState(false);
   const [ticker, setTicker] = useState("");
@@ -150,7 +159,7 @@ export default function Home() {
   const [selectedSearchResult, setSelectedSearchResult] =
     useState<AssetSearchResult | null>(null);
 
-  const analysis = analyze(assets, equal);
+  const analysis = useMemo(() => analyze(assets, equal), [assets, equal]);
   const selectedAsset = assets.find((asset) => asset.ticker === selected);
   const technologyExposure =
     analysis.sectors.find(([name]) => name === "Information Technology")?.[1] || 0;
@@ -225,7 +234,7 @@ export default function Home() {
 
       try {
         const searchKind = kind === "fund" ? "fund" : "security";
-        const response = await fetch(
+        const response = await apiFetch(
           `/api/search?kind=${searchKind}&q=${encodeURIComponent(searchText)}`,
           { signal: controller.signal },
         );
@@ -263,7 +272,7 @@ export default function Home() {
     forceRefresh = false,
   ): Promise<Asset> {
     const refreshParameter = forceRefresh ? "&refresh=1" : "";
-    const response = await fetch(
+    const response = await apiFetch(
       `/api/holdings?ticker=${encodeURIComponent(ticker)}${refreshParameter}`,
     );
     const data = (await response.json()) as Asset & { error?: string };
@@ -276,7 +285,7 @@ export default function Home() {
   }
 
   async function storeImportedFund(asset: Asset): Promise<Asset> {
-    const response = await fetch("/api/holdings", {
+    const response = await apiFetch("/api/holdings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -303,7 +312,7 @@ export default function Home() {
     const identityParameter = identityKey
       ? `&id=${encodeURIComponent(identityKey)}`
       : "";
-    const response = await fetch(
+    const response = await apiFetch(
       `/api/securities?ticker=${encodeURIComponent(ticker)}${identityParameter}`,
     );
 
@@ -450,16 +459,22 @@ export default function Home() {
   return (
     <div className="app">
       <header>
-        <Link className="brand" href="/">
+        <a className="brand" href="./">
           <span className="brand-icon">
             <Layers3 size={22} />
           </span>
           Portfolio<span className="brand-light">Lens</span>
-        </Link>
+        </a>
         <span className="header-label">PORTFOLIO INTELLIGENCE</span>
         <span className="private-label">Your portfolio, in focus</span>
       </header>
       <main>
+        {backendOffline && (
+          <p className="panel" role="status" style={{ padding: 16 }}>
+            Backend offline — bundled sample holdings remain available. Live search,
+            refresh and CSV uploads will return when it reconnects.
+          </p>
+        )}
         <div className="page-title">
           <div>
             <div className="eyebrow">LOOK BENEATH THE TICKER</div>
@@ -671,34 +686,11 @@ export default function Home() {
                       <h2>Sector exposure</h2>
                       <span className="small muted">% of portfolio</span>
                     </div>
-                    <div className="sectors">
-                      {analysis.sectors.length ? (
-                        analysis.sectors.map(([sectorName, exposure], index) => (
-                          <div key={sectorName} className="sector-row">
-                            <div>
-                              <span>{sectorName}</span>
-                              <strong>{formatPercentage(exposure)}</strong>
-                            </div>
-                            <div className="bar">
-                              <span
-                                style={{
-                                  width: `${Math.min(100, exposure)}%`,
-                                  background: CHART_COLORS[index % CHART_COLORS.length],
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="chart-empty">
-                          <ChartPie size={38} />
-                          <p>Your sector mix will appear here</p>
-                          <span>
-                            Add assets to reveal the companies behind your funds.
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                    <SectorExposure
+                      sectors={analysis.sectors}
+                      holdings={analysis.holdings}
+                      assets={assets}
+                    />
                   </section>
                   <section className="panel chart-panel overlap-panel">
                     <div className="panel-title">
