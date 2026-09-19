@@ -125,6 +125,8 @@ function AssetMark({ result }: { result: AssetSearchResult }) {
 }
 
 function formatPercentage(value: number) {
+  if (value === 0) return "0%";
+  if (value > 0 && value < 0.1) return "<0.1%";
   return `${value.toFixed(1)}%`;
 }
 
