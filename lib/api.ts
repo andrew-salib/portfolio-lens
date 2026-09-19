@@ -1,4 +1,5 @@
 import snapshots from "./snapshots.json";
+import performanceSnapshots from "./performance-snapshots.json";
 import { funds, type Asset } from "./portfolio";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -7,6 +8,12 @@ const STATIC_HOST = process.env.NEXT_PUBLIC_STATIC_HOST === "true";
 function bundledResponse(path: string): Response {
   const url = new URL(path, "https://portfolio.invalid");
   const ticker = url.searchParams.get("ticker") || "";
+  if (url.pathname === "/api/performance") {
+    return Response.json({
+      performance: performanceSnapshots.find((item) => item.ticker === ticker) || null,
+      offline: true,
+    });
+  }
   const samples = snapshots as Record<string, Asset>;
   if (url.pathname === "/api/holdings" && samples[ticker]) {
     return Response.json({ ...samples[ticker], status: "Bundled sample · offline" });

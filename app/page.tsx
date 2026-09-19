@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SectorExposure } from "@/components/sector-exposure";
+import { EtfPerformance } from "@/components/etf-performance";
 import { apiFetch } from "@/lib/api";
 import snapshots from "@/lib/snapshots.json";
 import {
@@ -767,6 +768,7 @@ export default function Home() {
                 <TabsTrigger value="overview">Exposure overview</TabsTrigger>
                 <TabsTrigger value="holdings">All holdings</TabsTrigger>
                 <TabsTrigger value="funds">Asset breakdown</TabsTrigger>
+                <TabsTrigger value="performance">ETF performance</TabsTrigger>
               </TabsList>
               <TabsContent value="overview">
                 <div className="charts">
@@ -841,6 +843,9 @@ export default function Home() {
                   </div>
                   <HoldingsTable rows={analysis.holdings.slice(0, 5)} />
                 </div>
+              </TabsContent>
+              <TabsContent value="performance">
+                <EtfPerformance assets={assets} />
               </TabsContent>
               <TabsContent value="holdings">
                 <div className="panel holdings-panel">

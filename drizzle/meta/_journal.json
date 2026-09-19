@@ -15,6 +15,13 @@
       "when": 1789650288793,
       "tag": "0001_sturdy_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789808118832,
+      "tag": "0002_flawless_prism",
+      "breakpoints": true
     }
   ]
 }

@@ -77,6 +77,25 @@ export const sectorRelations = relations(sectors, ({ many }) => ({
   securities: many(securities),
 }));
 
+export const performance = sqliteTable("performance", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  etfId: integer("etf_id")
+    .notNull()
+    .unique()
+    .references(() => etfs.id, {
+      onDelete: "cascade",
+    }),
+  oneYear: real("one_year"),
+  threeYearPa: real("three_year_pa"),
+  fiveYearPa: real("five_year_pa"),
+  tenYearPa: real("ten_year_pa"),
+  asOf: text("as_of").notNull(),
+  fetchedAt: text("fetched_at").notNull(),
+  currency: text("currency").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  basis: text("basis").notNull(),
+});
+
 export const securityRelations = relations(securities, ({ one, many }) => ({
   sector: one(sectors, {
     fields: [securities.sectorId],
