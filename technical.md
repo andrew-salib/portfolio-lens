@@ -191,6 +191,32 @@ refresh job currently runs.
 
 ## Database model
 
+### ETF performance
+
+`performance` has one current report per ETF, linked through unique `etf_id`
+to `etfs.id` (cascade delete). Columns `one_year`, `three_year_pa`,
+`five_year_pa` and `ten_year_pa` store percentage returns, with NULL for periods
+the issuer does not report. Metadata records `as_of`, `fetched_at`, `currency`,
+`source_url` and `basis`. The endpoint `GET /api/performance?ticker=VGS` reads
+this table; it returns `{ performance: null }` for unsupported funds or stocks.
+It is read-only and permitted through the gateway's ordinary request limit.
+
+`components/etf-performance.tsx` provides the ETF-only performance tab and period
+selector. Its SVG bar chart handles negative and zero returns without WebGL.
+These are reported fund returns, not personal portfolio earnings or a reconstructed
+historical price chart. `lib/api.ts` uses `lib/performance-snapshots.json` when
+the backend is unavailable, explicitly marked as an offline issuer snapshot.
+
+For existing databases, apply `drizzle/0002_flawless_prism.sql` once with the
+same local Wrangler command used below, then run `npm run db:seed-performance`.
+The seed command preserves newer reports and existing ETF metadata/holdings.
+Run it after migrations on fresh clones too. Performance data is fetched and
+reviewed from official issuers, then stored; there is no automatic refresh job.
+See [performance sources](docs/performance-sources.md) for verification rules.
+Run `npm run test:performance` to check migrations, seeds and missing-period logic.
+After merging, rebuild/restart the laptop service to expose the new gateway route;
+do not restart the public service with an unreviewed feature build.
+
 ```mermaid
 erDiagram
   sectors ||--o{ securities : classifies

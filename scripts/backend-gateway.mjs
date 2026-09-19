@@ -5,7 +5,12 @@ import { resolve, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
-const ROUTES = new Set(["/api/search", "/api/securities", "/api/holdings"]);
+const ROUTES = new Set([
+  "/api/search",
+  "/api/securities",
+  "/api/holdings",
+  "/api/performance",
+]);
 
 export function createGateway({
   upstream = "http://127.0.0.1:8787",

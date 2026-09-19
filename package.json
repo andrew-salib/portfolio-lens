@@ -6,6 +6,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "test:performance": "node --experimental-sqlite --test scripts/performance.test.mjs",
+    "db:seed-performance": "node --experimental-strip-types scripts/seed-performance.mjs",
     "build:pages": "vite build --config vite.pages.config.ts",
     "backend:gateway": "node --experimental-sqlite scripts/backend-gateway.mjs",
     "backend:host": "node scripts/host-laptop.mjs",

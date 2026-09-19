@@ -1,0 +1,110 @@
+[
+  {
+    "ticker": "VGS",
+    "asOf": "2026-08-31",
+    "fetchedAt": "2026-09-19",
+    "currency": "AUD",
+    "sourceUrl": "https://fund-docs.vanguard.com/ETF-Vanguard_MSCI_Index_International_Shares_ETF_8212_FS_VGS.pdf",
+    "basis": "ETF total return at NAV, after management fees, distributions reinvested; before investor taxes and trading costs.",
+    "returns": { "1": 10.04, "3": 16.25, "5": 11.76, "10": 13.7 }
+  },
+  {
+    "ticker": "NDQ",
+    "asOf": "2026-08-31",
+    "fetchedAt": "2026-09-19",
+    "currency": "AUD",
+    "sourceUrl": "https://www.betashares.com.au/fund/nasdaq-100-etf/",
+    "basis": "Fund NAV return after management fees and costs, distributions reinvested; before investor taxes and trading costs.",
+    "returns": { "1": 14.96, "3": 19.92, "5": 14.22, "10": 20.86 }
+  },
+  {
+    "ticker": "XMET",
+    "asOf": "2026-08-31",
+    "fetchedAt": "2026-09-19",
+    "currency": "AUD",
+    "sourceUrl": "https://www.betashares.com.au/fund/critical-minerals-etf/",
+    "basis": "Fund NAV return after management fees and costs, distributions reinvested; before investor taxes and trading costs. Fund inception: 2022-10-26; unavailable periods are not replaced with benchmark returns.",
+    "returns": { "1": 59.21, "3": 27.33, "5": null, "10": null }
+  },
+  {
+    "ticker": "AINF",
+    "asOf": "2026-09-17",
+    "fetchedAt": "2026-09-19",
+    "currency": "AUD",
+    "sourceUrl": "https://www.globalxetfs.com.au/funds/ainf/",
+    "basis": "Fund NAV total return including distributions, net of management fees and indirect costs, excluding exchange trading fees/spreads. Fund inception: 2025-04-28.",
+    "returns": { "1": 30.7, "3": null, "5": null, "10": null }
+  },
+  {
+    "ticker": "IVV",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes. Not the ASX-listed IVV.",
+    "returns": { "1": 22.29, "3": 20.58, "5": 13.37, "10": 15.47 }
+  },
+  {
+    "ticker": "IYW",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/239522/ishares-us-technology-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 45.82, "3": 32.66, "5": 20.86, "10": 26.08 }
+  },
+  {
+    "ticker": "ITOT",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/239724/ishares-core-sp-total-us-stock-market-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 23.05, "3": 20.43, "5": 12.24, "10": 15.01 }
+  },
+  {
+    "ticker": "IXUS",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/244048/ishares-core-msci-total-international-stock-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 27.35, "3": 18.86, "5": 8.77, "10": 10.07 }
+  },
+  {
+    "ticker": "IWM",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/239710/ishares-russell-2000-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 40.59, "3": 18.44, "5": 6.86, "10": 11.53 }
+  },
+  {
+    "ticker": "SOXX",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 169.6, "3": 56.92, "5": 34.5, "10": 36.59 }
+  },
+  {
+    "ticker": "IEFA",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/244049/ishares-core-msci-eafe-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 20, "3": 16.57, "5": 8.81, "10": 9.78 }
+  },
+  {
+    "ticker": "IEMG",
+    "asOf": "2026-06-30",
+    "fetchedAt": "2026-09-19",
+    "currency": "USD",
+    "sourceUrl": "https://www.ishares.com/us/products/244050/ishares-core-msci-emerging-markets-etf",
+    "basis": "US-listed ETF. Average annual Total Return (NAV), including reinvested distributions and fund expenses; before investor taxes.",
+    "returns": { "1": 42.48, "3": 22.61, "5": 7.46, "10": 10.13 }
+  }
+]

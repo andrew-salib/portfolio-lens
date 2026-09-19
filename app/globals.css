@@ -2,6 +2,30 @@
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 
+.performance-panel {
+  padding: 24px;
+}
+
+.performance-panel .panel-title {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.performance-chart {
+  display: block;
+  width: 100%;
+  margin: 24px 0;
+}
+
+.performance-source {
+  border-top: 1px solid #e2e6ef;
+  padding: 16px 0;
+}
+
+.performance-source p {
+  margin-top: 6px;
+}
+
 @utility scrollbar-thin {
   scrollbar-width: thin;
 }

@@ -37,5 +37,8 @@ jobs:
       - name: Verify gateway protections
         run: npm run test:gateway
 
+      - name: Verify performance data and migrations
+        run: npm run test:performance
+
       - name: Build app
         run: npm run build
