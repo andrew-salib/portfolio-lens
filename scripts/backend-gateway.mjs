@@ -10,6 +10,7 @@ const ROUTES = new Set([
   "/api/securities",
   "/api/holdings",
   "/api/performance",
+  "/api/deployment",
 ]);
 
 export function createGateway({
@@ -17,6 +18,7 @@ export function createGateway({
   origin = "https://andrew-salib.github.io",
   database = "backend-data/rate-limits.sqlite",
   now = Date.now,
+  version = process.env.BACKEND_VERSION,
 } = {}) {
   if (database !== ":memory:")
     mkdirSync(dirname(resolve(database)), { recursive: true });
@@ -74,6 +76,29 @@ export function createGateway({
         return send(429, `Too many requests. Try again in ${retry} seconds.`, {
           "Retry-After": String(retry),
         });
+      }
+    }
+    if (url.pathname === "/api/deployment" && request.method === "GET") {
+      if (!version) return send(503, "Backend build has no deployment stamp.");
+      try {
+        // Check the running worker and its database, not just this gateway.
+        for (const path of [
+          "/api/search?kind=fund&q=VGS",
+          "/api/performance?ticker=IVV",
+        ]) {
+          const result = await fetch(upstream + path, {
+            signal: AbortSignal.timeout(3000),
+          });
+          if (!result.ok) throw new Error("API unavailable");
+          const body = await result.json();
+          if (path.includes("performance") && !body.performance) {
+            throw new Error("Performance database is not seeded");
+          }
+        }
+        response.writeHead(200, { "Content-Type": "application/json" });
+        return response.end(JSON.stringify({ version }));
+      } catch {
+        return send(503, "Backend API/database is not ready.");
       }
     }
     if (upload && activeUploads >= 1)
