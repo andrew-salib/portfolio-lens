@@ -22,6 +22,7 @@ const COLORS = [
   "#6986d5",
 ];
 function percent(value: number) {
+  if (value === 0) return "0%";
   if (value > 0 && value < 0.01) return "<0.01%";
   return value.toFixed(2) + "%";
 }
