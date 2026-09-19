@@ -61,3 +61,28 @@ do not prevent malicious edits. Add owner authentication before broader use.
 
 GitHub pushes redeploy the front end only. Backend updates require rebuilding
 and restarting this laptop service.
+
+## Mandatory backend deployment check
+
+Pages checks `/api/deployment` before building and immediately before publishing.
+The gateway checks the worker's search endpoint and seeded performance database,
+then reports the backend source fingerprint captured at service startup. The
+workflow compares it with the backend inputs in its own checkout. There is no
+skip input; missing, unhealthy, or outdated backends fail the deployment.
+
+`npm run build` records source and compiled-artifact hashes in the ignored
+`backend-data/build-version.json`. The supervisor refuses to start if either has
+changed since the build. Backend inputs include `app/api`, `db`, `drizzle`, `lib`,
+`scripts`, package manifests/lockfiles, and backend build configuration. Shared
+library edits therefore conservatively require a backend deployment too.
+
+After merging backend work, apply any new migrations and required data seeds,
+run `npm run build` from the merged code, and restart the service using the command
+above. The new tunnel updates `API_URL` and starts another Pages deployment.
+The first deployment after introducing this gate will fail until the laptop is
+updated. An unavailable laptop also blocks new frontend deployments; already
+published pages continue to use bundled fallback data.
+
+This is a deployment-time check, not continuous uptime monitoring. Future API
+features needing new database tables should extend the health probes. GitHub
+workflow edits by repository administrators can change the gate.

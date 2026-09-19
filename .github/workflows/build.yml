@@ -40,5 +40,8 @@ jobs:
       - name: Verify performance data and migrations
         run: npm run test:performance
 
+      - name: Verify backend deployment gate
+        run: node --experimental-sqlite --test scripts/backend-deployment.test.mjs
+
       - name: Build app
         run: npm run build

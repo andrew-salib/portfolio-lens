@@ -13,3 +13,15 @@
   for the user's review.
 - Do not push feature changes directly to `main` or merge their pull requests
   unless the user explicitly requests it.
+
+# Backend deployment memory
+
+- When backend/server code, shared backend data, dependencies, or database schema
+  changes, deployment is not complete until the merged main code is built on the
+  laptop, required migrations/seeds are applied, and the backend/tunnel is restarted.
+- Run `npm run build`, then
+  `launchctl kickstart -k gui/$(id -u)/com.andrew.portfolio-lens`.
+- Verify the public API and successful Pages deployment with the new tunnel URL.
+  Never restart the public service with unmerged feature code.
+- Keep the mandatory live-backend checks in pages.yml. Do not bypass failures:
+  deploy the matching backend and rerun Pages. GitHub does not update the laptop.

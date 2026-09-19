@@ -1,10 +1,17 @@
 import { spawn, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 
 const project = fileURLToPath(new URL("../", import.meta.url));
 process.chdir(project);
 mkdirSync("backend-data", { recursive: true });
+// Refuse stale artifacts: a restart alone does not deploy changed server code.
+const { sourceVersion, artifactVersion } = await import("./backend-version.mjs");
+const build = JSON.parse(readFileSync("backend-data/build-version.json", "utf8"));
+if (build.source !== sourceVersion() || build.artifact !== artifactVersion()) {
+  throw new Error("Backend build is stale. Run npm run build before restarting.");
+}
+process.env.BACKEND_VERSION = build.source;
 const children = [];
 let stopping = false;
 

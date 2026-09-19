@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Require current live laptop backend
+        run: node scripts/check-backend-deployment.mjs
+        env:
+          API_URL: ${{ vars.API_URL }}
       - run: npm run install:ci
       - run: npm run build:pages
         env:
@@ -35,5 +39,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-pages
+      - name: Recheck backend before publishing
+        run: node scripts/check-backend-deployment.mjs
+        env:
+          API_URL: ${{ vars.API_URL }}
       - uses: actions/deploy-pages@v4
         id: deployment
