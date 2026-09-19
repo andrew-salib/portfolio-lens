@@ -1,5 +1,9 @@
 # vinext-starter
 
+For the current Portfolio Lens architecture, GitHub Pages deployment, laptop
+backend and contribution workflow, start with [technical.md](technical.md).
+The sections below describe the original starter and its Sites integration.
+
 A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
 
 ## Prerequisites

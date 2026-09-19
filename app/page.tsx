@@ -147,6 +147,13 @@ export default function Home() {
   const [weight, setWeight] = useState("");
   const [sector, setSector] = useState("Information Technology");
   const [equal, setEqual] = useState(false);
+  const [entryMode, setEntryMode] = useState("percent");
+  const [amounts, setAmounts] = useState<Record<string, number>>({});
+  const dollars = entryMode === "dollars";
+  const portfolioValue = assets.reduce(
+    (total, asset) => total + (amounts[asset.ticker] || 0),
+    0,
+  );
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("");
   const [custom, setCustom] = useState<Holding[]>([]);
@@ -159,13 +166,22 @@ export default function Home() {
   const [selectedSearchResult, setSelectedSearchResult] =
     useState<AssetSearchResult | null>(null);
 
-  const analysis = useMemo(() => analyze(assets, equal), [assets, equal]);
+  const analysis = useMemo(() => {
+    if (!dollars) return analyze(assets, equal);
+    if (!portfolioValue) return analyze([], true);
+    const weightedAssets = assets.map((asset) => ({
+      ...asset,
+      weight: ((amounts[asset.ticker] || 0) / portfolioValue) * 100,
+    }));
+    return analyze(weightedAssets);
+  }, [assets, equal, dollars, amounts, portfolioValue]);
   const selectedAsset = assets.find((asset) => asset.ticker === selected);
   const technologyExposure =
     analysis.sectors.find(([name]) => name === "Information Technology")?.[1] || 0;
-  const uniqueExposure = assets.length
-    ? Math.max(0, 100 - analysis.overlapPct - analysis.unknown)
-    : 0;
+  const uniqueExposure =
+    assets.length && (!dollars || portfolioValue > 0)
+      ? Math.max(0, 100 - analysis.overlapPct - analysis.unknown)
+      : 0;
   const overlapDescription = [
     `${formatPercentage(analysis.overlapPct)} shared`,
     `${formatPercentage(uniqueExposure)} unique`,
@@ -342,9 +358,15 @@ export default function Home() {
 
     if (
       weight !== "" &&
-      (!Number.isFinite(Number(weight)) || Number(weight) < 0 || Number(weight) > 100)
+      (!Number.isFinite(Number(weight)) ||
+        Number(weight) < 0 ||
+        Number(weight) > (dollars ? 1e12 : 100))
     ) {
-      return setError("Enter a weighting between 0 and 100.");
+      return setError(
+        dollars
+          ? "Enter an amount between $0 and $1 trillion."
+          : "Enter a weighting between 0 and 100.",
+      );
     }
 
     setBusy(true);
@@ -399,6 +421,10 @@ export default function Home() {
         throw new Error("Import a holdings CSV first.");
       }
 
+      if (dollars) {
+        setAmounts((current) => ({ ...current, [newAsset.ticker]: Number(weight) }));
+        newAsset = { ...newAsset, weight: 0 };
+      }
       setAssets((currentAssets) => [...currentAssets, newAsset]);
       setModal(false);
       setTicker("");
@@ -421,6 +447,8 @@ export default function Home() {
     try {
       const items = await Promise.all([fetchAsset("IVV", 50), fetchAsset("IYW", 30)]);
       setAssets([...items, NVIDIA_EXAMPLE]);
+      setEntryMode("percent");
+      setAmounts({});
       setExample(true);
     } catch (e) {
       setError((e as Error).message);
@@ -507,11 +535,35 @@ export default function Home() {
                 ? "Example portfolio · Replace with your assets."
                 : "Add stocks and funds, then set their weight."}
             </div>
+            <div style={{ marginTop: 16 }}>
+              <label className="form-label">
+                Enter portfolio by
+                <select
+                  className="form-input"
+                  value={entryMode}
+                  onChange={(event) => {
+                    setEntryMode(event.target.value);
+                    setEqual(false);
+                    setWeight("");
+                  }}
+                >
+                  <option value="percent">Percentage (%)</option>
+                  <option value="dollars">Dollar amount ($)</option>
+                </select>
+              </label>
+              {dollars && (
+                <p className="small muted">
+                  Enter current values in the same currency for every asset. Percentages
+                  are calculated from your entered total.
+                </p>
+              )}
+            </div>
             {example && (
               <button
                 className="text-button"
                 onClick={() => {
                   setAssets([]);
+                  setAmounts({});
                   setExample(false);
                 }}
               >
@@ -550,17 +602,30 @@ export default function Home() {
                     </button>
                   </div>
                   <div className="weight-row">
-                    <span className="small muted">Portfolio weight</span>
+                    <span className="small muted">
+                      {dollars ? "Current value" : "Portfolio weight"}
+                    </span>
                     <label className="weight-input">
                       <input
-                        aria-label={`${asset.ticker} portfolio weight`}
+                        aria-label={`${asset.ticker} ${dollars ? "dollar amount" : "portfolio weight"}`}
+                        style={dollars ? { width: 120 } : undefined}
                         type="number"
                         min="0"
-                        max="100"
-                        step="0.1"
-                        value={asset.weight}
+                        max={dollars ? 1e12 : 100}
+                        step={dollars ? "0.01" : "0.1"}
+                        value={dollars ? (amounts[asset.ticker] ?? "") : asset.weight}
                         disabled={equal}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          if (dollars) {
+                            const amount = Number(e.target.value);
+                            setAmounts((current) => ({
+                              ...current,
+                              [asset.ticker]: Number.isFinite(amount)
+                                ? Math.max(0, Math.min(1e12, amount))
+                                : 0,
+                            }));
+                            return;
+                          }
                           setAssets((currentAssets) =>
                             currentAssets.map((candidate) =>
                               candidate.ticker === asset.ticker
@@ -573,12 +638,22 @@ export default function Home() {
                                   }
                                 : candidate,
                             ),
-                          )
-                        }
+                          );
+                        }}
                       />
-                      <span>%</span>
+                      <span>{dollars ? "$" : "%"}</span>
                     </label>
                   </div>
+                  {dollars && (
+                    <p className="small muted">
+                      {formatPercentage(
+                        portfolioValue
+                          ? ((amounts[asset.ticker] || 0) / portfolioValue) * 100
+                          : 0,
+                      )}
+                      {" of portfolio"}
+                    </p>
+                  )}
                 </div>
               ))}
               {!assets.length && (
@@ -601,23 +676,37 @@ export default function Home() {
               <Plus size={16} /> Add another asset
             </button>
             <div className="allocation">
-              <span>Total allocation</span>
+              <span>{dollars ? "Portfolio value" : "Total allocation"}</span>
               <strong>
-                {equal && assets.length ? "100.0%" : formatPercentage(analysis.total)}
+                {dollars
+                  ? portfolioValue.toLocaleString("en-AU", {
+                      style: "currency",
+                      currency: "AUD",
+                    })
+                  : equal && assets.length
+                    ? "100.0%"
+                    : formatPercentage(analysis.total)}
               </strong>
             </div>
             <div className="allocation-track">
               <div style={{ width: `${Math.min(analysis.total, 100)}%` }} />
             </div>
-            <button className="text-button" onClick={() => setEqual(!equal)}>
-              {equal ? "Use my entered weights" : "Use equal weights"}
-            </button>
-            {!equal && analysis.total > 100 && (
+            {!dollars && (
+              <button className="text-button" onClick={() => setEqual(!equal)}>
+                {equal ? "Use my entered weights" : "Use equal weights"}
+              </button>
+            )}
+            {dollars && !portfolioValue && (
+              <p className="small muted">
+                Enter at least one dollar amount to calculate your breakdown.
+              </p>
+            )}
+            {!dollars && !equal && analysis.total > 100 && (
               <p className="small warning">
                 Weights exceed 100%. Results are normalized to your entered total.
               </p>
             )}
-            {!equal && analysis.total < 100 && assets.length > 0 && (
+            {!dollars && !equal && analysis.total < 100 && assets.length > 0 && (
               <p className="small muted">
                 {formatPercentage(100 - analysis.total)} is unallocated and excluded
                 from known exposure.
@@ -1040,20 +1129,22 @@ export default function Home() {
             </>
           )}
           <label className="form-label">
-            Portfolio weight (%)
+            {dollars ? "Current value ($)" : "Portfolio weight (%)"}
             <input
               className="form-input"
               type="number"
               min="0"
-              max="100"
-              step="0.1"
-              placeholder="e.g. 25"
+              max={dollars ? 1e12 : 100}
+              step={dollars ? "0.01" : "0.1"}
+              placeholder={dollars ? "e.g. 5000" : "e.g. 25"}
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
             />
           </label>
           <p className="small muted">
-            Leave blank to enter later, or use equal weights.
+            {dollars
+              ? "Leave blank to enter the value later. Use the same currency as your other assets."
+              : "Leave blank to enter later, or use equal weights."}
           </p>
           {error && (
             <p role="alert" className="warning">
