@@ -296,8 +296,8 @@ forwarded IP headers. Local development against the Worker bypasses the gateway.
 CORS and rate limits are not authentication. Public imports can modify shared
 ETF records, and direct-security seeding can also write during GET requests.
 The import quota does not cover every possible database write. Before broader
-public use, add authenticated import permissions and audit history; do not treat
-the existing Sites authentication helper as protection for this Pages deployment.
+public use, add authenticated import permissions and audit history. The current
+GitHub Pages and laptop deployment does not authenticate visitors.
 
 ## Local development and contribution
 
@@ -344,6 +344,10 @@ PAGES_BASE_PATH=/portfolio-lens/ npm run build:pages
 ```
 
 Before opening a PR:
+
+Create a new branch for each feature and open a pull request for the owner's
+review. Do not push feature changes directly to `main` or merge the PR without
+an explicit request. This workflow is also recorded in `AGENTS.md`.
 
 ```sh
 npx tsc --noEmit
